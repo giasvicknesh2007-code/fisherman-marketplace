@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fisherman Marketplace | Image Edition</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="app">
+        <!-- Auth Section -->
+        <section id="login-section" class="card">
+            <h1>Fisherman Marketplace</h1>
+            <p>Direct from the coast to your kitchen.</p>
+
+            <div id="auth-forms">
+                <!-- Login View -->
+                <div id="login-view">
+                    <input type="email" id="login-email" placeholder="Email address">
+                    <input type="password" id="login-password" placeholder="Password">
+                    <button id="login-btn" class="btn-primary">Login</button>
+                    <p class="toggle-text">Don't have an account? <span id="go-to-signup">Signup</span></p>
+                </div>
+
+                <!-- Signup View -->
+                <div id="signup-view" style="display: none;">
+                    <input type="text" id="signup-name" placeholder="Full Name">
+                    <input type="email" id="signup-email" placeholder="Email address">
+                    <input type="password" id="signup-password" placeholder="Password (min 6 chars)">
+                    <button id="signup-btn" class="btn-primary">Create Account</button>
+                    <p class="toggle-text">Already have an account? <span id="go-to-login">Login</span></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Content -->
+        <section id="main-section" style="display: none;">
+            <header class="main-header">
+                <div class="user-info">
+                    <h2>Marketplace Hub</h2>
+                    <p>Welcome, <span id="user-display-email"></span></p>
+                </div>
+                <button id="logout-btn" class="btn-secondary">Logout</button>
+            </header>
+
+            <div class="grid-container">
+                <!-- Post Section -->
+                <div class="card">
+                    <h3>List Your Catch</h3>
+                    <form id="post-fish-form">
+                        <input type="text" id="fish-name" placeholder="Fish Name (e.g. Vanjaram)" required>
+                        <input type="number" id="price" placeholder="Price (per kg in ₹)" required>
+                        <select id="district" required>
+                            <option value="" disabled selected>Select District</option>
+                            <option value="Chennai">Chennai</option>
+                            <option value="Chengalpattu">Chengalpattu</option>
+                            <option value="Villupuram">Villupuram</option>
+                            <option value="Cuddalore">Cuddalore</option>
+                            <option value="Mayiladuthurai">Mayiladuthurai</option>
+                            <option value="Nagapattinam">Nagapattinam</option>
+                            <option value="Tiruvarur">Tiruvarur</option>
+                            <option value="Thanjavur">Thanjavur</option>
+                            <option value="Pudukkottai">Pudukkottai</option>
+                            <option value="Ramanathapuram">Ramanathapuram</option>
+                            <option value="Thoothukudi">Thoothukudi</option>
+                            <option value="Tirunelveli">Tirunelveli</option>
+                            <option value="Kanyakumari">Kanyakumari</option>
+                        </select>
+                        <input type="tel" id="phone" placeholder="Contact Phone" required>
+                        <input type="text" id="image-url" placeholder="Paste fish image URL">
+                        <button type="submit" class="btn-primary">Post to Marketplace</button>
+                    </form>
+                </div>
+
+                <!-- Live Marketplace Section -->
+                <div class="card">
+                    <h3>Live Marketplace</h3>
+                    <div id="listings-container" class="listings-grid">
+                        <!-- Listings injected here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>
