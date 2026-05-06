@@ -38,3 +38,13 @@ Hosted on Firebase Hosting.
 - Real image uploads
 - Seller profiles
 - Loading animations
+
+## Screenshots
+
+### Login Page
+![Login](screenshots/login.png)
+
+### Marketplace Feed
+![Marketplace](screenshots/marketplace.png)
+
+
