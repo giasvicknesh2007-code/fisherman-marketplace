@@ -70,3 +70,6 @@ node_modules/
 
 # Private keys
 *.pem
+
+# Backend folder (if embedded)
+public/fisherman-backend
