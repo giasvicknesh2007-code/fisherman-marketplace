@@ -18,11 +18,20 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// --- DEBUG LOGS: START ---
+console.log("------------------------------------");
+console.log("SERVER INITIALIZING...");
+console.log("Mounting /api/auth routes...");
+// --- DEBUG LOGS: END ---
+
 // Mount Routes
 app.use("/api/jobs", jobsRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/protected", protectedRoutes);
 app.use("/api/fish", fishRoutes);
+
+console.log("Routes mounted successfully");
+console.log("------------------------------------");
 
 // Root
 app.get("/", (req, res) => {
