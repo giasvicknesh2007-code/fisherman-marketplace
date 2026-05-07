@@ -1,3 +1,4 @@
+console.log("COASTAL SERVER.JS EXECUTING");
 const express = require("express");
 const cors = require("cors");
 

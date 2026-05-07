@@ -1,3 +1,4 @@
+console.log("ROOT SERVER.JS EXECUTING");
 require("dotenv").config();
 
 const express = require("express");
