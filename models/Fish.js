@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const fishSchema = new mongoose.Schema(
+const FishSchema = new mongoose.Schema(
     {
         name: {
             type: String,
@@ -10,12 +10,19 @@ const fishSchema = new mongoose.Schema(
         price: {
             type: Number,
             required: true,
-            min: 0,
         },
         location: {
             type: String,
             required: true,
             trim: true,
+        },
+        phone: {
+            type: String,
+            required: true,
+        },
+        imageUrl: {
+            type: String,
+            default: "",
         },
         owner: {
             type: mongoose.Schema.Types.ObjectId,
@@ -24,8 +31,8 @@ const fishSchema = new mongoose.Schema(
         },
     },
     {
-        timestamps: true,
+        timestamps: true, // Automatically adds createdAt and updatedAt
     }
 );
 
-module.exports = mongoose.model("Fish", fishSchema);
+module.exports = mongoose.model("Fish", FishSchema);

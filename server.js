@@ -1,9 +1,11 @@
-console.log("ROOT SERVER.JS EXECUTING");
 require("dotenv").config();
 
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
+const path = require("path");
 
 // Routes
 const jobsRoutes = require("./routes/jobs");
@@ -16,30 +18,41 @@ const errorHandler = require("./middleware/errorHandler");
 
 const app = express();
 
+// --- SECURITY MIDDLEWARE ---
+app.use(helmet({
+    contentSecurityPolicy: false,
+}));
+
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+    message: "Too many requests from this IP, please try again after 15 minutes"
+});
+app.use("/api/", limiter);
+
 app.use(cors());
 app.use(express.json());
 
-// --- DEBUG LOGS: START ---
-console.log("------------------------------------");
-console.log("SERVER INITIALIZING...");
-console.log("Mounting /api/auth routes...");
-// --- DEBUG LOGS: END ---
-
-// Mount Routes
+// API ROUTES
 app.use("/api/jobs", jobsRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/protected", protectedRoutes);
 app.use("/api/fish", fishRoutes);
 
-console.log("Routes mounted successfully");
-console.log("------------------------------------");
+// STATIC FRONTEND
+app.use(express.static(path.join(__dirname, "public")));
 
-// Root
-app.get("/", (req, res) => {
-    res.send("Fisherman Marketplace API Running");
+// EXCLUDE SYSTEM REQUESTS (Express 5 Compatible Regex)
+app.get(/^\/\.well-known\/.*/, (req, res) => {
+    res.status(404).end();
 });
 
-// Centralized Error Handler (must be after routes)
+// --- CATCH-ALL FOR FRONTEND ROUTING (Express 5 Compatible Regex) ---
+app.get(/^\/(?!api).*/, (req, res) => {
+    res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+// Centralized Error Handler
 app.use(errorHandler);
 
 mongoose.connect(process.env.MONGO_URI)

@@ -68,14 +68,29 @@
                             <option value="Kanyakumari">Kanyakumari</option>
                         </select>
                         <input type="tel" id="phone" placeholder="Contact Phone" required>
-                        <input type="text" id="image-url" placeholder="Paste fish image URL">
-                        <button type="submit" class="btn-primary">Post to Marketplace</button>
+                        <label for="fish-image-file" class="file-label">Upload Fish Image:</label>
+                        <input type="file" id="fish-image-file" accept="image/*">
+                        <button type="submit" id="submit-fish-btn" class="btn-primary">Post to Marketplace</button>
                     </form>
                 </div>
 
                 <!-- Live Marketplace Section -->
                 <div class="card">
-                    <h3>Live Marketplace</h3>
+                    <h3>Marketplace</h3>
+                    
+                    <!-- Search & Filter -->
+                    <div class="filter-bar">
+                        <input type="text" id="search-input" placeholder="Search fish...">
+                        <select id="location-filter">
+                            <option value="">All Locations</option>
+                            <option value="Chennai">Chennai</option>
+                            <option value="Cuddalore">Cuddalore</option>
+                            <option value="Nagapattinam">Nagapattinam</option>
+                            <option value="Thoothukudi">Thoothukudi</option>
+                        </select>
+                        <button id="filter-btn" class="btn-secondary">Filter</button>
+                    </div>
+
                     <div id="listings-container" class="listings-grid">
                         <!-- Listings injected here -->
                     </div>

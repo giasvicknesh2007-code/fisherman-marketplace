@@ -1,64 +1,77 @@
 const express = require("express");
-const Fish = require("../models/Fish");
-const authMiddleware = require("../middleware/authMiddleware");
-
 const router = express.Router();
+const multer = require("multer");
+const { storage } = require("../config/cloudinary");
+const Fish = require("../models/Fish");
+const auth = require("../middleware/authMiddleware");
 
-// @route   POST /api/fish
-// @desc    Create a new listing (Protected)
-router.post("/", authMiddleware, async (req, res, next) => {
-    try {
-        const { name, price, location } = req.body;
-        
-        const fish = await Fish.create({
-            name,
-            price,
-            location,
-            owner: req.user.id
-        });
-
-        res.status(201).json({ success: true, data: fish });
-    } catch (error) {
-        next(error);
-    }
-});
+const upload = multer({ storage });
 
 // @route   GET /api/fish
-// @desc    View all listings (Public)
-router.get("/", async (req, res, next) => {
+router.get("/", async (req, res) => {
     try {
-        const listings = await Fish.find().populate("owner", "name email");
-        res.json({ success: true, data: listings });
+        const { location, search } = req.query;
+        let query = {};
+        if (location) query.location = location;
+        if (search) query.name = { $regex: search, $options: "i" };
+
+        const fish = await Fish.find(query)
+            .populate("owner", "name email")
+            .sort({ createdAt: -1 });
+
+        res.json({ success: true, count: fish.length, data: fish });
     } catch (error) {
-        next(error);
+        res.status(500).json({ success: false, message: error.message });
     }
 });
 
-// @route   PUT /api/fish/:id
-// @desc    Update own listing (Protected + Ownership)
-router.put("/:id", authMiddleware, async (req, res, next) => {
-    try {
-        let fish = await Fish.findById(req.params.id);
+// @route   POST /api/fish
+// @desc    Create a listing with image upload
+router.post(
+    "/",
+    auth,                   // 1. Verify Token
+    upload.single("image"), // 2. Parse Multipart Data (Populates req.body)
+    async (req, res) => {
+        try {
+            if (!req.body || Object.keys(req.body).length === 0) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Request body is empty. Ensure you are sending FormData correctly."
+                });
+            }
 
-        if (!fish) {
-            return res.status(404).json({ success: false, message: "Listing not found" });
+            // Using the names provided by the user in their latest request
+            const { name, price, location, phone } = req.body;
+
+            if (!name || !price || !location || !phone) {
+                return res.status(400).json({
+                    success: false,
+                    message: "All fields are required (name, price, location, phone)"
+                });
+            }
+
+            const imageUrl = req.file ? req.file.path : "";
+
+            const newFish = new Fish({
+                name,
+                price: parseFloat(price),
+                location,
+                phone,
+                imageUrl,
+                owner: req.user.id
+            });
+
+            const savedFish = await newFish.save();
+            res.status(201).json({ success: true, data: savedFish });
+        } catch (error) {
+            console.error("Fish Create Error:", error);
+            res.status(400).json({ success: false, message: error.message });
         }
-
-        // Ownership Security
-        if (fish.owner.toString() !== req.user.id) {
-            return res.status(403).json({ success: false, message: "Not authorized to update this listing" });
-        }
-
-        fish = await Fish.findByIdAndUpdate(req.params.id, req.body, { new: true });
-        res.json({ success: true, data: fish });
-    } catch (error) {
-        next(error);
     }
-});
+);
 
 // @route   DELETE /api/fish/:id
-// @desc    Delete own listing (Protected + Ownership)
-router.delete("/:id", authMiddleware, async (req, res, next) => {
+router.delete("/:id", auth, async (req, res) => {
     try {
         const fish = await Fish.findById(req.params.id);
 
@@ -66,15 +79,18 @@ router.delete("/:id", authMiddleware, async (req, res, next) => {
             return res.status(404).json({ success: false, message: "Listing not found" });
         }
 
-        // Ownership Security
+        // SERVER-SIDE OWNERSHIP ENFORCEMENT
         if (fish.owner.toString() !== req.user.id) {
-            return res.status(403).json({ success: false, message: "Not authorized to delete this listing" });
+            return res.status(403).json({
+                success: false,
+                message: "Unauthorized: You can only delete your own listings"
+            });
         }
 
         await fish.deleteOne();
-        res.json({ success: true, message: "Listing deleted successfully" });
+        res.json({ success: true, message: "Listing removed" });
     } catch (error) {
-        next(error);
+        res.status(500).json({ success: false, message: error.message });
     }
 });
 
